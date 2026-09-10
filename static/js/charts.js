@@ -2,15 +2,15 @@
  * WattWise - Chart.js Utility & Styling Engine
  */
 
-// Set global Chart.js defaults
+// Set global Chart.js defaults for Light Theme
 if (window.Chart) {
-    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.color = '#475569';
     Chart.defaults.font.family = "'Inter', -apple-system, sans-serif";
     Chart.defaults.font.size = 12;
     Chart.defaults.plugins.tooltip.backgroundColor = '#0f172a';
-    Chart.defaults.plugins.tooltip.titleColor = '#f8fafc';
-    Chart.defaults.plugins.tooltip.bodyColor = '#cbd5e1';
-    Chart.defaults.plugins.tooltip.borderColor = '#334155';
+    Chart.defaults.plugins.tooltip.titleColor = '#ffffff';
+    Chart.defaults.plugins.tooltip.bodyColor = '#f1f5f9';
+    Chart.defaults.plugins.tooltip.borderColor = '#cbd5e1';
     Chart.defaults.plugins.tooltip.borderWidth = 1;
     Chart.defaults.plugins.tooltip.padding = 10;
     Chart.defaults.plugins.tooltip.cornerRadius = 6;
@@ -18,37 +18,37 @@ if (window.Chart) {
 
 const ChartThemes = {
     emerald: {
-        border: '#10b981',
-        bg: 'rgba(16, 185, 129, 0.15)',
-        glow: 'rgba(16, 185, 129, 0.4)'
+        border: '#059669',
+        bg: 'rgba(5, 150, 105, 0.15)',
+        glow: 'rgba(5, 150, 105, 0.3)'
     },
     solar: {
-        border: '#f59e0b',
-        bg: 'rgba(245, 158, 11, 0.15)',
-        glow: 'rgba(245, 158, 11, 0.4)'
+        border: '#d97706',
+        bg: 'rgba(217, 119, 6, 0.15)',
+        glow: 'rgba(217, 119, 6, 0.3)'
     },
     cyan: {
-        border: '#06b6d4',
-        bg: 'rgba(6, 182, 212, 0.15)',
-        glow: 'rgba(6, 182, 212, 0.4)'
+        border: '#0284c7',
+        bg: 'rgba(2, 132, 199, 0.15)',
+        glow: 'rgba(2, 132, 199, 0.3)'
     },
     purple: {
-        border: '#8b5cf6',
-        bg: 'rgba(139, 92, 246, 0.15)'
+        border: '#7c3aed',
+        bg: 'rgba(124, 58, 237, 0.15)'
     },
     rose: {
-        border: '#f43f5e',
-        bg: 'rgba(244, 63, 94, 0.15)'
+        border: '#e11d48',
+        bg: 'rgba(225, 29, 72, 0.15)'
     },
     palette: [
-        '#10b981', '#f59e0b', '#06b6d4', '#8b5cf6', '#f43f5e',
-        '#3b82f6', '#ec4899', '#14b8a6', '#6366f1', '#eab308'
+        '#059669', '#d97706', '#0284c7', '#7c3aed', '#e11d48',
+        '#2563eb', '#db2777', '#0d9488', '#4f46e5', '#ca8a04'
     ]
 };
 
 function getGridOptions() {
     return {
-        color: 'rgba(51, 65, 85, 0.35)',
+        color: 'rgba(226, 232, 240, 0.8)',
         drawBorder: false
     };
 }
@@ -134,8 +134,8 @@ function buildDoughnutChart(canvasId, labels, data, colors = ChartThemes.palette
             datasets: [{
                 data: data,
                 backgroundColor: colors.slice(0, data.length),
-                borderColor: '#1e293b',
-                borderWidth: 3,
+                borderColor: '#ffffff',
+                borderWidth: 2,
                 hoverOffset: 6
             }]
         },

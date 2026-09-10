@@ -106,15 +106,15 @@
         <span class="card-badge">Scikit-Learn Ensemble</span>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; font-size: 0.85rem; color: var(--text-muted);">
-        <div style="background: rgba(15,23,42,0.5); padding: 14px; border-radius: 8px;">
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
             <strong style="color: var(--text-main); display: block; margin-bottom: 4px;">Dynamic Retraining:</strong>
             Model trains directly on historical SQLite records upon request without requiring pre-compiled static weights.
         </div>
-        <div style="background: rgba(15,23,42,0.5); padding: 14px; border-radius: 8px;">
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
             <strong style="color: var(--text-main); display: block; margin-bottom: 4px;">Engineered Features:</strong>
-            <code>hour</code>, <code>day_of_week</code>, <code>is_weekend</code>, <code>temperature</code>, <code>historical_building_mean</code>, and one-hot facility encodings.
+            <code style="color: #7c3aed; font-weight: 600;">hour</code>, <code style="color: #7c3aed; font-weight: 600;">day_of_week</code>, <code style="color: #7c3aed; font-weight: 600;">is_weekend</code>, <code style="color: #7c3aed; font-weight: 600;">temperature</code>, <code style="color: #7c3aed; font-weight: 600;">historical_building_mean</code>, and one-hot facility encodings.
         </div>
-        <div style="background: rgba(15,23,42,0.5); padding: 14px; border-radius: 8px;">
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
             <strong style="color: var(--text-main); display: block; margin-bottom: 4px;">High-Availability Fallback:</strong>
             If database size drops below threshold or training errors occur, an empirical historical diurnal model takes over automatically.
         </div>

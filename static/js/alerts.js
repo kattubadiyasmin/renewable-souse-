@@ -92,20 +92,20 @@ function renderFilteredAlerts() {
         else if (a.severity === 'MEDIUM') badgeClass = 'badge-medium';
 
         let methodBadge = a.detection_method.includes('IsolationForest') 
-            ? '<span class="card-badge" style="color:#a78bfa; border:1px solid rgba(167,139,250,0.3);"><i class="fas fa-brain"></i> ML Model</span>'
+            ? '<span class="card-badge" style="color:#6d28d9; border:1px solid #ddd6fe; background:#f5f3ff;"><i class="fas fa-brain"></i> ML Model</span>'
             : '<span class="card-badge"><i class="fas fa-sliders"></i> Rule Engine</span>';
 
         return `
             <tr>
-                <td style="font-weight: 600;">${a.building}</td>
+                <td style="font-weight: 700;">${a.building}</td>
                 <td style="color: var(--text-dim); font-size: 0.8rem;">
                     <div>${a.date}</div>
-                    <div style="color: var(--text-main); font-weight: 500;">${a.time}</div>
+                    <div style="color: var(--text-main); font-weight: 600;">${a.time}</div>
                 </td>
                 <td><span class="badge ${badgeClass}">${a.severity}</span></td>
-                <td style="font-weight: 600; color: #f8fafc;">${a.issue}</td>
+                <td style="font-weight: 700; color: #0f172a;">${a.issue}</td>
                 <td style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">${a.reason}</td>
-                <td style="font-size: 0.82rem; color: #6ee7b7; line-height: 1.4;">
+                <td style="font-size: 0.82rem; color: #047857; line-height: 1.4; font-weight: 500;">
                     <i class="fas fa-wrench" style="margin-right: 4px;"></i> ${a.recommendation}
                 </td>
                 <td>${methodBadge}</td>

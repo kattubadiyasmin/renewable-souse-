@@ -129,7 +129,7 @@ function appendStreamRow(r) {
 
     const row = document.createElement('tr');
     if (r.is_anomaly) {
-        row.style.backgroundColor = 'rgba(239, 68, 68, 0.12)';
+        row.style.backgroundColor = '#fef2f2';
     }
 
     const statusBadge = r.is_anomaly

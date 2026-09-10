@@ -70,15 +70,15 @@ function updatePredictionUI(d) {
     if (banner) {
         if (d.is_fallback) {
             banner.style.display = 'block';
-            banner.style.backgroundColor = 'rgba(245, 158, 11, 0.15)';
-            banner.style.border = '1px solid rgba(245, 158, 11, 0.35)';
-            banner.style.color = '#fcd34d';
+            banner.style.backgroundColor = '#fffbeb';
+            banner.style.border = '1px solid #fed7aa';
+            banner.style.color = '#b45309';
             banner.innerHTML = `<i class="fas fa-triangle-exclamation"></i> <strong>Fallback Model Active:</strong> ${d.notes}`;
         } else {
             banner.style.display = 'block';
-            banner.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
-            banner.style.border = '1px solid rgba(16, 185, 129, 0.35)';
-            banner.style.color = '#6ee7b7';
+            banner.style.backgroundColor = '#ecfdf5';
+            banner.style.border = '1px solid #a7f3d0';
+            banner.style.color = '#047857';
             banner.innerHTML = `<i class="fas fa-circle-check"></i> <strong>Model Status:</strong> ${d.notes} (Trained dynamically on SQLite data)`;
         }
     }
@@ -98,8 +98,8 @@ function updatePredictionUI(d) {
         {
             label: `Forecasted Demand for ${d.selected_building} (kWh)`,
             data: demands,
-            borderColor: '#8b5cf6',
-            backgroundColor: 'rgba(139, 92, 246, 0.18)',
+            borderColor: '#7c3aed',
+            backgroundColor: 'rgba(124, 58, 237, 0.12)',
             borderWidth: 2.5,
             tension: 0.35,
             fill: true,
@@ -109,7 +109,7 @@ function updatePredictionUI(d) {
         {
             label: 'Estimated Temperature (°C)',
             data: temps,
-            borderColor: '#f59e0b',
+            borderColor: '#d97706',
             borderDash: [5, 5],
             borderWidth: 1.5,
             pointRadius: 2,

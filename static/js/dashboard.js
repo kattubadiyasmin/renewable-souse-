@@ -90,8 +90,8 @@ function renderCharts(charts) {
     consumptionTrendChart = buildLineChart('chart-consumption-trend', dailyLabels, [{
         label: 'Daily Consumption (kWh)',
         data: consData,
-        borderColor: '#10b981',
-        backgroundColor: 'rgba(16, 185, 129, 0.12)',
+        borderColor: '#059669',
+        backgroundColor: 'rgba(5, 150, 105, 0.12)',
         tension: 0.35,
         fill: true,
         borderWidth: 2,
@@ -103,8 +103,8 @@ function renderCharts(charts) {
     solarTrendChart = buildLineChart('chart-solar-trend', dailyLabels, [{
         label: 'Solar Generated (kWh)',
         data: solarGenData,
-        borderColor: '#f59e0b',
-        backgroundColor: 'rgba(245, 158, 11, 0.12)',
+        borderColor: '#d97706',
+        backgroundColor: 'rgba(217, 119, 6, 0.15)',
         tension: 0.35,
         fill: true,
         borderWidth: 2,
@@ -123,8 +123,8 @@ function renderCharts(charts) {
         {
             label: 'Avg Consumption (kWh)',
             data: hourlyCons,
-            borderColor: '#38bdf8',
-            backgroundColor: 'rgba(56, 189, 248, 0.08)',
+            borderColor: '#0284c7',
+            backgroundColor: 'rgba(2, 132, 199, 0.08)',
             borderWidth: 2.5,
             tension: 0.3,
             fill: false
@@ -132,8 +132,8 @@ function renderCharts(charts) {
         {
             label: 'Avg Solar Generated (kWh)',
             data: hourlySolar,
-            borderColor: '#f59e0b',
-            backgroundColor: 'rgba(245, 158, 11, 0.2)',
+            borderColor: '#d97706',
+            backgroundColor: 'rgba(217, 119, 6, 0.2)',
             borderWidth: 2,
             tension: 0.35,
             fill: true
@@ -141,8 +141,8 @@ function renderCharts(charts) {
         {
             label: 'Avg Solar Used (kWh)',
             data: hourlySolarUsed,
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.25)',
+            borderColor: '#059669',
+            backgroundColor: 'rgba(5, 150, 105, 0.25)',
             borderWidth: 2,
             tension: 0.35,
             fill: true
@@ -155,7 +155,7 @@ function renderCharts(charts) {
     const bldCons = bld.map(b => b.total_consumption);
 
     if (buildingBarChart) buildingBarChart.destroy();
-    buildingBarChart = buildBarChart('chart-building-bar', bldLabels, bldCons, 'Total kWh', '#10b981');
+    buildingBarChart = buildBarChart('chart-building-bar', bldLabels, bldCons, 'Total kWh', '#059669');
 
     // 5. Energy Distribution Doughnut Chart
     if (distributionChart) distributionChart.destroy();
