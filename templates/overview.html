@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+
+{% block title %}WattWise - AI-Powered Smart Renewable Energy Management System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div style="background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.15), rgba(15, 23, 42, 0.95)), var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 48px 40px; margin-bottom: 32px; position: relative; overflow: hidden;">
+    <div style="position: absolute; right: -20px; top: -20px; font-size: 16rem; opacity: 0.03; color: var(--primary); pointer-events: none;">
+        <i class="fas fa-solar-panel"></i>
+    </div>
+    
+    <div style="max-width: 800px; position: relative; z-index: 2;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.15); border: 1px solid var(--primary-glow); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; color: #6ee7b7; margin-bottom: 20px;">
+            <i class="fas fa-leaf"></i>
+            <span>Smart Energy. Sustainable Future.</span>
+        </div>
+        
+        <h1 style="font-size: 2.75rem; font-weight: 800; line-height: 1.15; margin-bottom: 16px; background: linear-gradient(135deg, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            WATTWISE
+        </h1>
+        
+        <p style="font-size: 1.25rem; font-weight: 600; color: var(--primary); margin-bottom: 12px;">
+            AI-Powered Smart Renewable Energy Management System
+        </p>
+
+        <p style="font-size: 1.05rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+            <strong>Mission:</strong> "Reduce Energy Waste, Maximize Renewable Energy."<br>
+            Empowering college campuses and organizations to transition towards net-zero emissions through intelligent load orchestration, machine learning forecasting, and real-time wastage mitigation.
+        </p>
+
+        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary" style="padding: 12px 24px; font-size: 0.95rem;">
+                <i class="fas fa-gauge-high"></i>
+                <span>Explore Dashboard</span>
+            </a>
+            <a href="{{ url_for('main.recommendations') }}" class="btn btn-secondary" style="padding: 12px 24px; font-size: 0.95rem;">
+                <i class="fas fa-lightbulb"></i>
+                <span>View Smart Recommendations</span>
+            </a>
+            <a href="{{ url_for('main.live_monitor') }}" class="btn btn-solar" style="padding: 12px 24px; font-size: 0.95rem;">
+                <i class="fas fa-satellite-dish"></i>
+                <span>Live Energy Monitor</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Problem vs Solution Matrix -->
+<div class="charts-grid-2" style="margin-bottom: 32px;">
+    <!-- Problem Card -->
+    <div class="card" style="border-left: 4px solid var(--danger);">
+        <div class="card-header">
+            <h3 class="card-title" style="color: #fca5a5;">
+                <i class="fas fa-circle-exclamation" style="color: var(--danger);"></i>
+                The Core Problem
+            </h3>
+            <span class="badge badge-high">Campus Energy Inefficiency</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 16px;">
+            Educational and corporate campuses routinely face severe visibility gaps:
+        </p>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.88rem; color: var(--text-main);">
+            <li style="display: flex; gap: 10px;">
+                <i class="fas fa-xmark" style="color: var(--danger); margin-top: 3px;"></i>
+                <span><strong>Opaque consumption:</strong> Unknown which academic blocks consume disproportionate power.</span>
+            </li>
+            <li style="display: flex; gap: 10px;">
+                <i class="fas fa-xmark" style="color: var(--danger); margin-top: 3px;"></i>
+                <span><strong>Off-hours wastage:</strong> Air-conditioning, computer labs, and lighting left running overnight.</span>
+            </li>
+            <li style="display: flex; gap: 10px;">
+                <i class="fas fa-xmark" style="color: var(--danger); margin-top: 3px;"></i>
+                <span><strong>Curtailed solar:</strong> Inability to synchronize high daytime solar generation with flexible loads.</span>
+            </li>
+            <li style="display: flex; gap: 10px;">
+                <i class="fas fa-xmark" style="color: var(--danger); margin-top: 3px;"></i>
+                <span><strong>Unpredictable demand peaks:</strong> Exorbitant grid demand charges during simultaneous load spikes.</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Solution Card -->
+    <div class="card" style="border-left: 4px solid var(--primary);">
+        <div class="card-header">
+            <h3 class="card-title" style="color: #6ee7b7;">
+                <i class="fas fa-shield-halved" style="color: var(--primary);"></i>
+                The WattWise Solution
+            </h3>
+            <span class="badge badge-success">End-to-End AI Engine</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 16px;">
+            WattWise unifies telemetry, analytics, and dynamic machine learning into a single actionable command center:
+        </p>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.88rem; color: var(--text-main);">
+            <li style="display: flex; gap: 10px;">
+                <i class="fas fa-check" style="color: var(--primary); margin-top: 3px;"></i>
+                <span><strong>Telemetry & Monitoring:</strong> Real-time tracking of consumption, solar yield, and battery reserves.</span>
+            </li>
+            <li style="display: flex; gap: 10px;">
+                <i class="fas fa-check" style="color: var(--primary); margin-top: 3px;"></i>
+                <span><strong>Isolation Forest Anomaly Detection:</strong> Instant detection of overnight spikes and battery drops.</span>
+            </li>
+            <li style="display: flex; gap: 10px;">
+                <i class="fas fa-check" style="color: var(--primary); margin-top: 3px;"></i>
+                <span><strong>Random Forest Demand Forecasting:</strong> 24-hour predictive planning to avoid grid tariff peaks.</span>
+            </li>
+            <li style="display: flex; gap: 10px;">
+                <i class="fas fa-check" style="color: var(--primary); margin-top: 3px;"></i>
+                <span><strong>Dynamic Recommendations:</strong> Targeted operational policies to shift loads and maximize solar ROI.</span>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Core Workflow Pipeline -->
+<div class="card" style="margin-bottom: 32px;">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-diagram-project"></i>
+            The Core Architecture Workflow
+        </h3>
+        <span class="card-badge">Closed-Loop Optimization</span>
+    </div>
+    
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0;">
+        <div style="flex: 1; min-width: 110px; background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px 12px; text-align: center;">
+            <div style="width: 38px; height: 38px; background: rgba(16, 185, 129, 0.15); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1rem;">
+                <i class="fas fa-database"></i>
+            </div>
+            <strong style="font-size: 0.82rem; display: block; color: var(--text-main);">1. COLLECT</strong>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">IoT & Meter Data</span>
+        </div>
+        
+        <i class="fas fa-arrow-right" style="color: var(--text-dim);"></i>
+
+        <div style="flex: 1; min-width: 110px; background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px 12px; text-align: center;">
+            <div style="width: 38px; height: 38px; background: rgba(6, 182, 212, 0.15); color: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1rem;">
+                <i class="fas fa-desktop"></i>
+            </div>
+            <strong style="font-size: 0.82rem; display: block; color: var(--text-main);">2. MONITOR</strong>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Live Telemetry</span>
+        </div>
+
+        <i class="fas fa-arrow-right" style="color: var(--text-dim);"></i>
+
+        <div style="flex: 1; min-width: 110px; background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px 12px; text-align: center;">
+            <div style="width: 38px; height: 38px; background: rgba(59, 130, 246, 0.15); color: var(--info); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1rem;">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <strong style="font-size: 0.82rem; display: block; color: var(--text-main);">3. ANALYZE</strong>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Trends & Yield</span>
+        </div>
+
+        <i class="fas fa-arrow-right" style="color: var(--text-dim);"></i>
+
+        <div style="flex: 1; min-width: 110px; background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px 12px; text-align: center;">
+            <div style="width: 38px; height: 38px; background: rgba(239, 68, 68, 0.15); color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1rem;">
+                <i class="fas fa-triangle-exclamation"></i>
+            </div>
+            <strong style="font-size: 0.82rem; display: block; color: var(--text-main);">4. DETECT</strong>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Wastage Anomaly</span>
+        </div>
+
+        <i class="fas fa-arrow-right" style="color: var(--text-dim);"></i>
+
+        <div style="flex: 1; min-width: 110px; background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px 12px; text-align: center;">
+            <div style="width: 38px; height: 38px; background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1rem;">
+                <i class="fas fa-brain"></i>
+            </div>
+            <strong style="font-size: 0.82rem; display: block; color: var(--text-main);">5. PREDICT</strong>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Demand Forecast</span>
+        </div>
+
+        <i class="fas fa-arrow-right" style="color: var(--text-dim);"></i>
+
+        <div style="flex: 1; min-width: 110px; background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px 12px; text-align: center;">
+            <div style="width: 38px; height: 38px; background: rgba(245, 158, 11, 0.15); color: var(--solar); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1rem;">
+                <i class="fas fa-sliders"></i>
+            </div>
+            <strong style="font-size: 0.82rem; display: block; color: var(--text-main);">6. OPTIMIZE</strong>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Solar Balancing</span>
+        </div>
+
+        <i class="fas fa-arrow-right" style="color: var(--text-dim);"></i>
+
+        <div style="flex: 1; min-width: 110px; background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px 12px; text-align: center;">
+            <div style="width: 38px; height: 38px; background: rgba(16, 185, 129, 0.15); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1rem;">
+                <i class="fas fa-lightbulb"></i>
+            </div>
+            <strong style="font-size: 0.82rem; display: block; color: var(--text-main);">7. RECOMMEND</strong>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Action Policies</span>
+        </div>
+    </div>
+</div>
+
+<!-- 6 Key Features Grid -->
+<h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 20px;">Platform Capabilities</h3>
+<div class="charts-grid-3">
+    <div class="card">
+        <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(16, 185, 129, 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 16px;">
+            <i class="fas fa-bolt"></i>
+        </div>
+        <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 8px;">Smart Energy Monitoring</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            Granular building-by-building tracking of campus facilities including Main Block, Labs, Library, Administration, and Hostels.
+        </p>
+    </div>
+
+    <div class="card">
+        <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(245, 158, 11, 0.12); color: var(--solar); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 16px;">
+            <i class="fas fa-sun"></i>
+        </div>
+        <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 8px;">Solar Energy Tracking</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            Quantify photovoltaic generation, calculate direct solar utilization percentages, and identify curtailment waste during peak sunlight.
+        </p>
+    </div>
+
+    <div class="card">
+        <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(6, 182, 212, 0.12); color: var(--cyan); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 16px;">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 8px;">Energy Analytics</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            Interactive charts, diurnal load profiles, building share distributions, and dynamic textual insights synthesized from real data.
+        </p>
+    </div>
+
+    <div class="card">
+        <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(239, 68, 68, 0.12); color: var(--danger); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 16px;">
+            <i class="fas fa-triangle-exclamation"></i>
+        </div>
+        <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 8px;">Wastage Detection</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            Hybrid detection combining rule-based off-hours thresholds with Scikit-learn Isolation Forest machine learning to flag abnormal spikes.
+        </p>
+    </div>
+
+    <div class="card">
+        <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(139, 92, 246, 0.12); color: #a78bfa; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 16px;">
+            <i class="fas fa-brain"></i>
+        </div>
+        <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 8px;">Energy Demand Prediction</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            RandomForestRegressor dynamically trained on historical consumption, diurnal cycles, and temperature to forecast 24-hour demand curves.
+        </p>
+    </div>
+
+    <div class="card">
+        <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(16, 185, 129, 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 16px;">
+            <i class="fas fa-lightbulb"></i>
+        </div>
+        <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 8px;">Smart Recommendations</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            Dynamic, data-driven action plans providing estimated kWh savings, battery load shedding, and intelligent peak-shaving instructions.
+        </p>
+    </div>
+</div>
+{% endblock %}

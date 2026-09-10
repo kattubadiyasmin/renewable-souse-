@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}WattWise - AI-Powered Smart Renewable Energy Management System{% endblock %}</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="app-sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <div class="logo-text">
+                <h1>WATTWISE</h1>
+                <p>Smart Campus Energy</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Core Operations</div>
+            <a href="{{ url_for('main.overview') }}" class="nav-item {% if active_page == 'overview' %}active{% endif %}">
+                <i class="fas fa-compass"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('main.dashboard') }}" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('main.live_monitor') }}" class="nav-item {% if active_page == 'live' %}active{% endif %}">
+                <i class="fas fa-satellite-dish"></i>
+                <span>Live Monitor</span>
+                <span class="badge badge-success" style="margin-left: auto; font-size: 0.65rem;">LIVE</span>
+            </a>
+
+            <div class="nav-section-title">AI & Analytics</div>
+            <a href="{{ url_for('main.analytics') }}" class="nav-item {% if active_page == 'analytics' %}active{% endif %}">
+                <i class="fas fa-chart-line"></i>
+                <span>Energy Analytics</span>
+            </a>
+            <a href="{{ url_for('main.alerts') }}" class="nav-item {% if active_page == 'alerts' %}active{% endif %}">
+                <i class="fas fa-triangle-exclamation"></i>
+                <span>Wastage Detection</span>
+            </a>
+            <a href="{{ url_for('main.prediction') }}" class="nav-item {% if active_page == 'prediction' %}active{% endif %}">
+                <i class="fas fa-brain"></i>
+                <span>Demand Prediction</span>
+            </a>
+            <a href="{{ url_for('main.solar') }}" class="nav-item {% if active_page == 'solar' %}active{% endif %}">
+                <i class="fas fa-sun"></i>
+                <span>Solar Analysis</span>
+            </a>
+            <a href="{{ url_for('main.recommendations') }}" class="nav-item {% if active_page == 'recommendations' %}active{% endif %}">
+                <i class="fas fa-lightbulb"></i>
+                <span>Recommendations</span>
+            </a>
+
+            <div class="nav-section-title">Data Management</div>
+            <a href="{{ url_for('main.add_data') }}" class="nav-item {% if active_page == 'add-data' %}active{% endif %}">
+                <i class="fas fa-plus-circle"></i>
+                <span>Add Energy Data</span>
+            </a>
+            <a href="{{ url_for('main.upload') }}" class="nav-item {% if active_page == 'upload' %}active{% endif %}">
+                <i class="fas fa-file-csv"></i>
+                <span>Upload Dataset</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="system-badge">
+                <div class="status-dot"></div>
+                <div>
+                    <div style="font-weight: 600; color: var(--text-main);">Campus Microgrid</div>
+                    <div style="font-size: 0.7rem;">Self-Learning Engine Active</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <!-- Sticky Top Navigation Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle" id="mobile-toggle-btn" aria-label="Toggle Navigation">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="campus-tag">
+                    <i class="fas fa-school"></i>
+                    <span>Apex University Smart Campus</span>
+                    <span style="color: var(--text-dim);">|</span>
+                    <small>WattWise v1.0</small>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <div class="clock-display">
+                    <i class="far fa-clock"></i>
+                    <span id="topbar-clock">--:--:--</span>
+                </div>
+                <button class="topbar-btn" id="reset-demo-btn" title="Reset sample data for hackathon presentation">
+                    <i class="fas fa-rotate-left"></i>
+                    <span>Reset Demo Data</span>
+                </button>
+                <a href="{{ url_for('api.api_sample_csv') }}" class="topbar-btn" title="Download Sample CSV">
+                    <i class="fas fa-download"></i>
+                    <span>Sample CSV</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Page Specific Content -->
+        <main class="content-body">
+            {% if error_message %}
+            <div class="card" style="text-align: center; padding: 48px 24px; margin-top: 40px;">
+                <i class="fas fa-triangle-exclamation" style="font-size: 3rem; color: var(--warning); margin-bottom: 16px;"></i>
+                <h2>Notice</h2>
+                <p style="color: var(--text-muted); margin: 12px 0 24px;">{{ error_message }}</p>
+                <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary">Return to Dashboard</a>
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+
+<!-- Global Toast Notification Container -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Shared JavaScript -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+
+<!-- Page Specific JavaScript -->
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

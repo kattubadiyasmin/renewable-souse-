@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+
+{% block title %}WattWise - Add Energy Reading{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            <i class="fas fa-plus-circle" style="color: var(--primary);"></i>
+            Record Energy Telemetry
+        </h1>
+        <p class="page-subtitle">Manually register facility readings with real-time constraint validation</p>
+    </div>
+</div>
+
+<div class="charts-grid-2" style="margin-bottom: 32px;">
+    <!-- Manual Entry Form -->
+    <div class="card" style="grid-column: span 2;">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-file-pen"></i>
+                Energy Reading Entry Form
+            </h3>
+            <span class="card-badge">Strict ORM Validation</span>
+        </div>
+
+        <form id="add-energy-form">
+            <div class="form-grid">
+                <!-- Date -->
+                <div class="form-group">
+                    <label class="form-label" for="reading-date">Date <span style="color: var(--danger);">*</span></label>
+                    <input type="date" id="reading-date" name="date" class="form-control" value="{{ default_date }}" required>
+                    <span class="form-hint">YYYY-MM-DD</span>
+                </div>
+
+                <!-- Time -->
+                <div class="form-group">
+                    <label class="form-label" for="reading-time">Time <span style="color: var(--danger);">*</span></label>
+                    <input type="time" id="reading-time" name="time" class="form-control" value="{{ default_time }}" required>
+                    <span class="form-hint">24-hour format (HH:MM)</span>
+                </div>
+
+                <!-- Building Name -->
+                <div class="form-group">
+                    <label class="form-label" for="reading-building">Building Name <span style="color: var(--danger);">*</span></label>
+                    <select id="reading-building" name="building_name" class="form-control" required onchange="syncBuildingType()">
+                        {% for b in buildings %}
+                        <option value="{{ b }}">{{ b }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Building Type -->
+                <div class="form-group">
+                    <label class="form-label" for="reading-type">Building Type</label>
+                    <input type="text" id="reading-type" name="building_type" class="form-control" value="Academic" readonly style="background: rgba(15,23,42,0.4); color: var(--text-muted);">
+                    <span class="form-hint">Auto-mapped by facility profile</span>
+                </div>
+
+                <!-- Energy Consumption -->
+                <div class="form-group">
+                    <label class="form-label" for="reading-consumption">Energy Consumption (kWh) <span style="color: var(--danger);">*</span></label>
+                    <input type="number" id="reading-consumption" name="energy_consumption" class="form-control" step="0.01" min="0" placeholder="e.g. 32.50" required>
+                    <span class="form-hint">Must be a positive value</span>
+                </div>
+
+                <!-- Solar Generated -->
+                <div class="form-group">
+                    <label class="form-label" for="reading-solar-gen">Solar Generated (kWh)</label>
+                    <input type="number" id="reading-solar-gen" name="solar_generated" class="form-control" step="0.01" min="0" placeholder="e.g. 45.00" value="0.0">
+                    <span class="form-hint">Total solar produced</span>
+                </div>
+
+                <!-- Solar Used -->
+                <div class="form-group">
+                    <label class="form-label" for="reading-solar-used">Solar Used (kWh)</label>
+                    <input type="number" id="reading-solar-used" name="solar_used" class="form-control" step="0.01" min="0" placeholder="e.g. 28.00" value="0.0">
+                    <span class="form-hint">Cannot exceed Solar Generated</span>
+                </div>
+
+                <!-- Battery Level -->
+                <div class="form-group">
+                    <label class="form-label" for="reading-battery">Battery Level (%)</label>
+                    <input type="number" id="reading-battery" name="battery_level" class="form-control" step="0.1" min="0" max="100" placeholder="e.g. 78.5" value="75.0">
+                    <span class="form-hint">Range: 0 to 100%</span>
+                </div>
+
+                <!-- Temperature -->
+                <div class="form-group">
+                    <label class="form-label" for="reading-temp">Temperature (°C)</label>
+                    <input type="number" id="reading-temp" name="temperature" class="form-control" step="0.1" min="-30" max="70" placeholder="e.g. 29.4" value="28.0">
+                    <span class="form-hint">Ambient temperature</span>
+                </div>
+
+                <!-- Weather Condition -->
+                <div class="form-group">
+                    <label class="form-label" for="reading-weather">Weather Condition</label>
+                    <select id="reading-weather" name="weather_condition" class="form-control">
+                        {% for w in weather_list %}
+                        <option value="{{ w }}">{{ w }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px; display: flex; gap: 12px;">
+                <button type="submit" class="btn btn-primary" id="save-reading-btn">
+                    <i class="fas fa-floppy-disk"></i>
+                    <span>Save Energy Reading</span>
+                </button>
+                <button type="reset" class="btn btn-secondary">
+                    <i class="fas fa-rotate-left"></i>
+                    <span>Clear Form</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Recent Database Entries Preview -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-database"></i>
+            Recently Recorded Database Readings
+        </h3>
+        <span class="card-badge">Last 10 Records</span>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="custom-table" id="recent-readings-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Building</th>
+                    <th>Type</th>
+                    <th>Consumption (kWh)</th>
+                    <th>Solar Gen (kWh)</th>
+                    <th>Solar Used (kWh)</th>
+                    <th>Battery</th>
+                    <th>Weather</th>
+                </tr>
+            </thead>
+            <tbody id="recent-readings-body">
+                {% for r in recent_readings %}
+                <tr>
+                    <td>#{{ r.id }}</td>
+                    <td>{{ r.date }}</td>
+                    <td>{{ r.time }}</td>
+                    <td style="font-weight: 600;">{{ r.building_name }}</td>
+                    <td><span class="card-badge">{{ r.building_type }}</span></td>
+                    <td style="color: var(--primary); font-weight: 600;">{{ r.energy_consumption }}</td>
+                    <td style="color: var(--solar);">{{ r.solar_generated }}</td>
+                    <td>{{ r.solar_used }}</td>
+                    <td>{{ r.battery_level }}%</td>
+                    <td>{{ r.weather_condition }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const buildingMap = {{ building_map | tojson }};
+
+function syncBuildingType() {
+    const sel = document.getElementById('reading-building').value;
+    const typeInput = document.getElementById('reading-type');
+    typeInput.value = buildingMap[sel] || 'General';
+}
+
+document.getElementById('add-energy-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const saveBtn = document.getElementById('save-reading-btn');
+    const form = e.target;
+    
+    // Client-side quick checks
+    const consumption = parseFloat(document.getElementById('reading-consumption').value);
+    const solarGen = parseFloat(document.getElementById('reading-solar-gen').value) || 0;
+    const solarUsed = parseFloat(document.getElementById('reading-solar-used').value) || 0;
+    const battery = parseFloat(document.getElementById('reading-battery').value) || 0;
+    
+    if (consumption < 0) {
+        showToast('Energy consumption cannot be negative.', 'error');
+        return;
+    }
+    if (solarUsed > solarGen + 0.001) {
+        showToast(`Solar used (${solarUsed} kWh) cannot exceed solar generated (${solarGen} kWh).`, 'error');
+        return;
+    }
+    if (battery < 0 || battery > 100) {
+        showToast('Battery level must be between 0 and 100%.', 'error');
+        return;
+    }
+
+    try {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const formData = new FormData(form);
+        const res = await fetch('/api/energy', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+            showToast(data.message || 'Energy reading saved successfully.', 'success');
+            
+            // Add to top of preview table
+            const tbody = document.getElementById('recent-readings-body');
+            const r = data.data;
+            const newRow = document.createElement('tr');
+            newRow.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+            newRow.innerHTML = `
+                <td>#${r.id}</td>
+                <td>${r.date}</td>
+                <td>${r.time}</td>
+                <td style="font-weight: 600;">${r.building_name}</td>
+                <td><span class="card-badge">${r.building_type}</span></td>
+                <td style="color: var(--primary); font-weight: 600;">${r.energy_consumption}</td>
+                <td style="color: var(--solar);">${r.solar_generated}</td>
+                <td>${r.solar_used}</td>
+                <td>${r.battery_level}%</td>
+                <td>${r.weather_condition}</td>
+            `;
+            tbody.insertBefore(newRow, tbody.firstChild);
+            
+            // Reset input values
+            document.getElementById('reading-consumption').value = '';
+            document.getElementById('reading-solar-gen').value = '0.0';
+            document.getElementById('reading-solar-used').value = '0.0';
+        } else {
+            const errorMsg = data.errors ? data.errors.join('<br>') : (data.message || 'Error saving reading.');
+            showToast(errorMsg, 'error');
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('Failed to connect to server.', 'error');
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-floppy-disk"></i> <span>Save Energy Reading</span>';
+    }
+});
+</script>
+{% endblock %}

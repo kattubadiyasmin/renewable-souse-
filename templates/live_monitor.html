@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}WattWise - Live Energy Monitor & Campus Simulation{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            <i class="fas fa-satellite-dish" style="color: var(--primary);"></i>
+            Real-Time Campus Energy Monitor
+        </h1>
+        <p class="page-subtitle">Physics-based simulation engine generating diurnal solar and load telemetry</p>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <span class="badge badge-success" style="padding: 8px 14px; font-size: 0.8rem;">
+            <i class="fas fa-circle-dot fa-fade"></i> SYSTEM STATUS: LIVE
+        </span>
+    </div>
+</div>
+
+<!-- Live Control Panel -->
+<div class="card" style="margin-bottom: 28px; padding: 20px 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+            <div class="form-group" style="min-width: 180px;">
+                <label class="form-label" for="live-building-select"><i class="fas fa-building"></i> Facility Telemetry</label>
+                <select id="live-building-select" class="form-control">
+                    {% for b in buildings %}
+                    <option value="{{ b }}">{{ b }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 22px;">
+                <input type="checkbox" id="live-simulate-anomaly" style="width: 18px; height: 18px; accent-color: var(--danger); cursor: pointer;">
+                <label for="live-simulate-anomaly" style="font-size: 0.85rem; font-weight: 600; color: #fca5a5; cursor: pointer;">
+                    Inject Wastage Anomaly
+                </label>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 22px;">
+                <input type="checkbox" id="live-auto-stream" style="width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;">
+                <label for="live-auto-stream" style="font-size: 0.85rem; font-weight: 600; color: #6ee7b7; cursor: pointer;">
+                    Auto-Stream Mode (Every 3s)
+                </label>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 22px;">
+            <button class="btn btn-primary" onclick="generateLiveReading()" id="gen-live-btn">
+                <i class="fas fa-bolt"></i>
+                <span>Generate Live Reading</span>
+            </button>
+            <button class="btn btn-secondary" onclick="saveCurrentLiveReading()" id="save-live-btn">
+                <i class="fas fa-floppy-disk"></i>
+                <span>Save to Database</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Anomaly Alert Flash Box -->
+<div id="live-anomaly-alert" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 28px;">
+    <div style="display: flex; align-items: center; gap: 14px;">
+        <i class="fas fa-triangle-exclamation" style="font-size: 1.8rem; color: var(--danger);"></i>
+        <div>
+            <h4 style="font-size: 1.05rem; font-weight: 700; color: #fca5a5; margin-bottom: 4px;">
+                Critical Telemetry Anomaly Detected!
+            </h4>
+            <p style="font-size: 0.88rem; color: var(--text-main);" id="live-anomaly-msg">
+                Abnormal consumption pattern detected.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Live Telemetry Gauges / Cards -->
+<div class="kpi-grid" style="margin-bottom: 28px;">
+    <!-- Consumption -->
+    <div class="kpi-card" style="border-left-color: var(--cyan);">
+        <div class="kpi-info">
+            <h3>Current Demand</h3>
+            <div class="kpi-value" id="live-cons">--</div>
+            <div class="kpi-subtext"><i class="fas fa-plug"></i> Active electrical draw</div>
+        </div>
+        <div class="kpi-icon" style="background: rgba(6, 182, 212, 0.1); color: var(--cyan);"><i class="fas fa-bolt"></i></div>
+    </div>
+
+    <!-- Solar Gen -->
+    <div class="kpi-card solar">
+        <div class="kpi-info">
+            <h3>Solar PV Yield</h3>
+            <div class="kpi-value" id="live-solar-gen">--</div>
+            <div class="kpi-subtext"><i class="fas fa-sun"></i> Irradiance generation</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-solar-panel"></i></div>
+    </div>
+
+    <!-- Solar Used -->
+    <div class="kpi-card">
+        <div class="kpi-info">
+            <h3>Solar Direct Load</h3>
+            <div class="kpi-value" id="live-solar-used">--</div>
+            <div class="kpi-subtext"><i class="fas fa-network-wired"></i> Building absorbed</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-plug-circle-check"></i></div>
+    </div>
+
+    <!-- Battery -->
+    <div class="kpi-card" id="live-batt-card">
+        <div class="kpi-info">
+            <h3>Battery Reserve</h3>
+            <div class="kpi-value" id="live-battery">--</div>
+            <div class="kpi-subtext" id="live-batt-sub"><i class="fas fa-battery-half"></i> Storage state</div>
+        </div>
+        <div class="kpi-icon" id="live-batt-icon"><i class="fas fa-car-battery"></i></div>
+    </div>
+
+    <!-- Temperature -->
+    <div class="kpi-card">
+        <div class="kpi-info">
+            <h3>Ambient Temp</h3>
+            <div class="kpi-value" id="live-temp">--</div>
+            <div class="kpi-subtext"><i class="fas fa-temperature-half"></i> Campus weather station</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-temperature-high"></i></div>
+    </div>
+
+    <!-- Weather Condition -->
+    <div class="kpi-card solar">
+        <div class="kpi-info">
+            <h3>Weather Sky</h3>
+            <div class="kpi-value" id="live-weather" style="font-size: 1.4rem;">--</div>
+            <div class="kpi-subtext" id="live-timestamp"><i class="far fa-clock"></i> Live Time</div>
+        </div>
+        <div class="kpi-icon" id="live-weather-icon"><i class="fas fa-sun"></i></div>
+    </div>
+</div>
+
+<!-- Live Telemetry Stream History -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-tower-broadcast"></i>
+            Live Telemetry Event Log
+        </h3>
+        <span class="card-badge" id="stream-count-badge">0 Readings Logged</span>
+    </div>
+
+    <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
+        <table class="custom-table" id="live-stream-table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Facility</th>
+                    <th>Consumption (kWh)</th>
+                    <th>Solar Gen (kWh)</th>
+                    <th>Solar Used (kWh)</th>
+                    <th>Battery</th>
+                    <th>Temp (°C)</th>
+                    <th>Condition</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="live-stream-body">
+                <tr>
+                    <td colspan="9" style="text-align: center; color: var(--text-dim); padding: 20px;">
+                        Click "Generate Live Reading" or toggle "Auto-Stream Mode" to begin live monitoring.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/live_monitor.js') }}"></script>
+{% endblock %}

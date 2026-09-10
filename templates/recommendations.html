@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}WattWise - Smart Energy Recommendations{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            <i class="fas fa-lightbulb" style="color: var(--primary);"></i>
+            Smart Energy Recommendations Engine
+        </h1>
+        <p class="page-subtitle">Dynamic, rule-based algorithmic action plans generated directly from active campus telemetry</p>
+    </div>
+    <div>
+        <button class="btn btn-secondary" onclick="loadRecommendations()" id="recs-refresh-btn">
+            <i class="fas fa-arrows-rotate"></i>
+            <span>Refresh Recommendations</span>
+        </button>
+    </div>
+</div>
+
+<!-- Recommendations Overview Banner -->
+<div class="kpi-grid" style="margin-bottom: 28px;">
+    <div class="kpi-card">
+        <div class="kpi-info">
+            <h3>Active Policies</h3>
+            <div class="kpi-value" id="rec-total-count">--</div>
+            <div class="kpi-subtext"><i class="fas fa-list-check"></i> Actionable measures</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-clipboard-list"></i></div>
+    </div>
+
+    <div class="kpi-card danger">
+        <div class="kpi-info">
+            <h3>Urgent Interventions</h3>
+            <div class="kpi-value" id="rec-urgent-count" style="color: var(--danger);">--</div>
+            <div class="kpi-subtext"><i class="fas fa-triangle-exclamation"></i> High Priority</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-radiation"></i></div>
+    </div>
+
+    <div class="kpi-card solar">
+        <div class="kpi-info">
+            <h3>Solar Utilization</h3>
+            <div class="kpi-value" id="rec-solar-util">--</div>
+            <div class="kpi-subtext"><i class="fas fa-sun"></i> Active capture rate</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-solar-panel"></i></div>
+    </div>
+
+    <div class="kpi-card cyan">
+        <div class="kpi-info">
+            <h3>Top Load Target</h3>
+            <div class="kpi-value" id="rec-top-building" style="font-size: 1.3rem;">--</div>
+            <div class="kpi-subtext" id="rec-top-share"><i class="fas fa-building"></i> Highest consumer</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-crosshairs"></i></div>
+    </div>
+</div>
+
+<!-- Recommendations List Container -->
+<div id="recommendations-container">
+    <div class="card" style="text-align: center; padding: 40px;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary); margin-bottom: 12px;"></i>
+        <p style="color: var(--text-muted);">Evaluating campus load dynamics, storage reserves, and anomaly patterns...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    loadRecommendations();
+});
+
+async function loadRecommendations() {
+    const container = document.getElementById('recommendations-container');
+    const refreshBtn = document.getElementById('recs-refresh-btn');
+
+    try {
+        if (refreshBtn) {
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        }
+
+        const res = await fetch('/api/recommendations');
+        const json = await res.json();
+
+        if (json.status !== 'success') {
+            showToast(json.message || 'Error generating recommendations.', 'error');
+            return;
+        }
+
+        const data = json.data;
+        
+        // Update summary KPIs
+        document.getElementById('rec-total-count').textContent = data.total_recommendations;
+        document.getElementById('rec-urgent-count').textContent = data.high_priority_count;
+        if (data.campus_summary) {
+            document.getElementById('rec-solar-util').innerHTML = `${data.campus_summary.solar_utilization} <span class="kpi-unit">%</span>`;
+            document.getElementById('rec-top-building').textContent = data.campus_summary.top_building;
+            document.getElementById('rec-top-share').textContent = `${data.campus_summary.top_bld_share}% of total load`;
+        }
+
+        renderRecommendationsList(data.recommendations);
+
+    } catch (err) {
+        console.error(err);
+        showToast('Failed to load recommendations.', 'error');
+    } finally {
+        if (refreshBtn) {
+            refreshBtn.disabled = false;
+            refreshBtn.innerHTML = '<i class="fas fa-arrows-rotate"></i> <span>Refresh Recommendations</span>';
+        }
+    }
+}
+
+function renderRecommendationsList(recs) {
+    const container = document.getElementById('recommendations-container');
+    if (!container) return;
+
+    if (!recs || recs.length === 0) {
+        container.innerHTML = `
+            <div class="card" style="text-align: center; padding: 48px;">
+                <i class="fas fa-circle-check" style="font-size: 3rem; color: var(--primary); margin-bottom: 16px;"></i>
+                <h3>All Systems Operating Optimally</h3>
+                <p style="color: var(--text-muted); margin-top: 8px;">No critical energy wastage or solar imbalances detected.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = recs.map(r => {
+        let priClass = 'priority-info';
+        let badgeClass = 'badge-low';
+        if (r.priority === 'HIGH') {
+            priClass = 'priority-high';
+            badgeClass = 'badge-high';
+        } else if (r.priority === 'MEDIUM') {
+            priClass = 'priority-medium';
+            badgeClass = 'badge-medium';
+        }
+
+        const actionItems = r.action_plan.map(act => `
+            <li><i class="fas fa-arrow-right" style="color: var(--primary); font-size: 0.75rem; margin-right: 6px;"></i> ${act}</li>
+        `).join('');
+
+        return `
+            <div class="rec-card ${priClass}">
+                <div class="rec-header">
+                    <div class="rec-title-group">
+                        <div class="rec-icon">
+                            <i class="fas ${r.icon || 'fa-lightbulb'}" style="color: var(--primary);"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main);">${r.title}</h3>
+                            <span style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">${r.category} &bull; Policy ID: ${r.id}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="badge ${badgeClass}">${r.priority} Priority</span>
+                    </div>
+                </div>
+
+                <div class="rec-reason">
+                    <strong style="color: var(--text-muted);"><i class="fas fa-crosshairs" style="color: var(--solar); margin-right: 4px;"></i> Diagnostic Trigger:</strong> 
+                    ${r.trigger_reason}
+                </div>
+
+                <div class="rec-actions">
+                    <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">
+                        Prescribed Remediation Steps:
+                    </div>
+                    <ul style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 8px;">
+                        ${actionItems}
+                    </ul>
+                </div>
+
+                <div class="rec-impact">
+                    <i class="fas fa-chart-line-up"></i>
+                    <span>Estimated Efficiency Impact: ${r.estimated_impact}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+</script>
+{% endblock %}

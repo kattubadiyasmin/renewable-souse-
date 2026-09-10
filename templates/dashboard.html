@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}WattWise - Campus Energy Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            <i class="fas fa-chart-pie" style="color: var(--primary);"></i>
+            Energy Command Center
+        </h1>
+        <p class="page-subtitle">Real-time telemetry, renewable generation metrics, and efficiency tracking</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <button class="btn btn-secondary" onclick="loadDashboardData()" id="refresh-dash-btn">
+            <i class="fas fa-arrows-rotate"></i>
+            <span>Refresh Data</span>
+        </button>
+        <a href="{{ url_for('main.live_monitor') }}" class="btn btn-primary">
+            <i class="fas fa-satellite-dish"></i>
+            <span>Live Stream</span>
+        </a>
+    </div>
+</div>
+
+<!-- Dynamic Insights Callout -->
+<div class="insight-box" id="dashboard-insight-box">
+    <h4>
+        <i class="fas fa-sparkles"></i>
+        Dynamic Intelligence Highlights
+    </h4>
+    <ul class="insight-list" id="dashboard-insights-list">
+        <li class="insight-item"><i class="fas fa-spinner fa-spin"></i> Calculating campus energy telemetry...</li>
+    </ul>
+</div>
+
+<!-- 6 Real KPI Metric Cards -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-info">
+            <h3>Total Consumption</h3>
+            <div class="kpi-value" id="kpi-total-cons">--</div>
+            <div class="kpi-subtext"><i class="fas fa-building"></i> Across all 5 facilities</div>
+        </div>
+        <div class="kpi-icon">
+            <i class="fas fa-bolt"></i>
+        </div>
+    </div>
+
+    <div class="kpi-card solar">
+        <div class="kpi-info">
+            <h3>Total Solar Generated</h3>
+            <div class="kpi-value" id="kpi-solar-gen">--</div>
+            <div class="kpi-subtext"><i class="fas fa-sun"></i> Photovoltaic arrays</div>
+        </div>
+        <div class="kpi-icon">
+            <i class="fas fa-solar-panel"></i>
+        </div>
+    </div>
+
+    <div class="kpi-card cyan">
+        <div class="kpi-info">
+            <h3>Total Solar Used</h3>
+            <div class="kpi-value" id="kpi-solar-used">--</div>
+            <div class="kpi-subtext"><i class="fas fa-battery-charging"></i> Directly absorbed</div>
+        </div>
+        <div class="kpi-icon">
+            <i class="fas fa-plug-circle-bolt"></i>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-info">
+            <h3>Renewable Contribution</h3>
+            <div class="kpi-value" id="kpi-renewable-pct">--</div>
+            <div class="kpi-subtext"><i class="fas fa-leaf"></i> Net green fraction</div>
+        </div>
+        <div class="kpi-icon">
+            <i class="fas fa-percent"></i>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-info">
+            <h3>Efficiency Score</h3>
+            <div class="kpi-value" id="kpi-efficiency-score">--</div>
+            <div class="kpi-subtext"><i class="fas fa-gauge-high"></i> Benchmark: 100 max</div>
+        </div>
+        <div class="kpi-icon">
+            <i class="fas fa-award"></i>
+        </div>
+    </div>
+
+    <div class="kpi-card danger">
+        <div class="kpi-info">
+            <h3>Wastage Alerts</h3>
+            <div class="kpi-value" id="kpi-alerts-count" style="color: var(--danger);">--</div>
+            <div class="kpi-subtext" id="kpi-high-alerts-subtext"><i class="fas fa-triangle-exclamation"></i> Active anomalies</div>
+        </div>
+        <div class="kpi-icon">
+            <i class="fas fa-bell"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Grid: Row 1 -->
+<div class="charts-grid-2">
+    <!-- Chart 1: Energy Consumption Trend -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-chart-line"></i>
+                Energy Consumption Trend (14 Days)
+            </h3>
+            <span class="card-badge">Campus Total</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-consumption-trend"></canvas>
+        </div>
+    </div>
+
+    <!-- Chart 2: Solar Generation Trend -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title" style="color: var(--solar);">
+                <i class="fas fa-sun"></i>
+                Solar Generation Trend (14 Days)
+            </h3>
+            <span class="card-badge">Daily Photovoltaic</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-solar-trend"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Grid: Row 2 -->
+<div class="charts-grid-3">
+    <!-- Chart 3: Consumption vs Solar (Diurnal Curve) -->
+    <div class="card" style="grid-column: span 2;">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-code-compare"></i>
+                Consumption vs Solar Generation (Hourly Diurnal Profile)
+            </h3>
+            <span class="card-badge">24-Hour Average</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-diurnal-curve"></canvas>
+        </div>
+    </div>
+
+    <!-- Chart 5: Energy Distribution -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-chart-pie"></i>
+                Building Energy Share
+            </h3>
+            <span class="card-badge">Distribution</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-energy-distribution"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Row 3: Building-Wise Comparison & Recent Wastage Alerts -->
+<div class="charts-grid-2">
+    <!-- Chart 4: Building-wise Energy Consumption -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-building"></i>
+                Building-Wise Energy Consumption
+            </h3>
+            <span class="card-badge">Total Load (kWh)</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-building-bar"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Wastage Alerts Table -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title" style="color: var(--danger);">
+                <i class="fas fa-triangle-exclamation"></i>
+                Recent Active Wastage Alerts
+            </h3>
+            <a href="{{ url_for('main.alerts') }}" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;">
+                View All Alerts
+            </a>
+        </div>
+        <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+            <table class="custom-table" id="dashboard-alerts-table">
+                <thead>
+                    <tr>
+                        <th>Building</th>
+                        <th>Time</th>
+                        <th>Issue</th>
+                        <th>Severity</th>
+                    </tr>
+                </thead>
+                <tbody id="dashboard-alerts-body">
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--text-dim);">Scanning for anomalies...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

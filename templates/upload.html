@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+
+{% block title %}WattWise - Upload Energy Dataset{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            <i class="fas fa-file-csv" style="color: var(--primary);"></i>
+            Batch Dataset Ingestion
+        </h1>
+        <p class="page-subtitle">Upload CSV campus telemetry datasets with Pandas automated parsing & validation</p>
+    </div>
+    <div>
+        <a href="{{ url_for('api.api_sample_csv') }}" class="btn btn-secondary">
+            <i class="fas fa-download"></i>
+            <span>Download Sample CSV</span>
+        </a>
+    </div>
+</div>
+
+<div class="charts-grid-2" style="margin-bottom: 32px;">
+    <!-- Upload Area Card -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-cloud-arrow-up"></i>
+                Upload Telemetry CSV
+            </h3>
+            <span class="card-badge">Supports .csv</span>
+        </div>
+
+        <form id="csv-upload-form">
+            <div class="upload-zone" id="drop-zone">
+                <div class="upload-icon">
+                    <i class="fas fa-file-csv"></i>
+                </div>
+                <h4 style="font-size: 1.1rem; margin-bottom: 8px;">Drag & Drop your CSV file here</h4>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
+                    or click the button below to browse local files
+                </p>
+                <input type="file" id="csv-file-input" name="file" accept=".csv" style="display: none;" required>
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('csv-file-input').click()">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Select CSV File</span>
+                </button>
+                <div id="file-name-display" style="margin-top: 14px; font-weight: 600; color: var(--primary); font-size: 0.88rem; display: none;"></div>
+            </div>
+
+            <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn btn-primary" id="upload-submit-btn" disabled>
+                    <i class="fas fa-upload"></i>
+                    <span>Process & Import Dataset</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Expected Schema Details -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-circle-info"></i>
+                Expected CSV Schema
+            </h3>
+            <span class="card-badge">10 Columns</span>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
+            The uploaded file must contain a header row with the following column headers (case-insensitive):
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.8rem;">
+            <div style="background: rgba(15,23,42,0.6); padding: 8px 12px; border-radius: 6px;">
+                <code>date</code> <span style="color: var(--text-dim);">(YYYY-MM-DD)</span>
+            </div>
+            <div style="background: rgba(15,23,42,0.6); padding: 8px 12px; border-radius: 6px;">
+                <code>time</code> <span style="color: var(--text-dim);">(HH:MM:SS)</span>
+            </div>
+            <div style="background: rgba(15,23,42,0.6); padding: 8px 12px; border-radius: 6px;">
+                <code>building_name</code> <span style="color: var(--text-dim);">(Name)</span>
+            </div>
+            <div style="background: rgba(15,23,42,0.6); padding: 8px 12px; border-radius: 6px;">
+                <code>building_type</code> <span style="color: var(--text-dim);">(Type)</span>
+            </div>
+            <div style="background: rgba(15,23,42,0.6); padding: 8px 12px; border-radius: 6px;">
+                <code>energy_consumption</code> <span style="color: var(--text-dim);">(kWh)</span>
+            </div>
+            <div style="background: rgba(15,23,42,0.6); padding: 8px 12px; border-radius: 6px;">
+                <code>solar_generated</code> <span style="color: var(--text-dim);">(kWh)</span>
+            </div>
+            <div style="background: rgba(15,23,42,0.6); padding: 8px 12px; border-radius: 6px;">
+                <code>solar_used</code> <span style="color: var(--text-dim);">(<= Generated)</span>
+            </div>
+            <div style="background: rgba(15,23,42,0.6); padding: 8px 12px; border-radius: 6px;">
+                <code>battery_level</code> <span style="color: var(--text-dim);">(0-100%)</span>
+            </div>
+            <div style="background: rgba(15,23,42,0.6); padding: 8px 12px; border-radius: 6px;">
+                <code>temperature</code> <span style="color: var(--text-dim);">(°C)</span>
+            </div>
+            <div style="background: rgba(15,23,42,0.6); padding: 8px 12px; border-radius: 6px;">
+                <code>weather_condition</code> <span style="color: var(--text-dim);">(Sunny/Rain)</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--border-glow); padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.82rem; color: #6ee7b7;">
+            <i class="fas fa-check-double"></i>
+            Currently <strong>{{ total_count }}</strong> records are loaded in the SQLite database.
+        </div>
+    </div>
+</div>
+
+<!-- Upload Results Feedback Card -->
+<div class="card" id="upload-results-card" style="display: none;">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-list-check"></i>
+            Ingestion Summary
+        </h3>
+        <span class="badge badge-success" id="result-status-badge">Complete</span>
+    </div>
+
+    <div class="kpi-grid" style="margin-bottom: 20px;">
+        <div class="kpi-card">
+            <div class="kpi-info">
+                <h3>Total In File</h3>
+                <div class="kpi-value" id="res-total-rows">0</div>
+            </div>
+            <div class="kpi-icon"><i class="fas fa-file-lines"></i></div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-info">
+                <h3>Imported</h3>
+                <div class="kpi-value" id="res-imported" style="color: var(--primary);">0</div>
+            </div>
+            <div class="kpi-icon"><i class="fas fa-circle-check"></i></div>
+        </div>
+        <div class="kpi-card danger">
+            <div class="kpi-info">
+                <h3>Skipped / Invalid</h3>
+                <div class="kpi-value" id="res-skipped" style="color: var(--danger);">0</div>
+            </div>
+            <div class="kpi-icon"><i class="fas fa-triangle-exclamation"></i></div>
+        </div>
+    </div>
+
+    <div id="skipped-details-box" style="display: none;">
+        <h4 style="font-size: 0.95rem; margin-bottom: 10px; color: var(--danger);">Skipped Rows Details</h4>
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Row Number</th>
+                        <th>Validation Errors</th>
+                    </tr>
+                </thead>
+                <tbody id="skipped-errors-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('csv-file-input');
+const fileNameDisplay = document.getElementById('file-name-display');
+const submitBtn = document.getElementById('upload-submit-btn');
+const form = document.getElementById('csv-upload-form');
+
+fileInput.addEventListener('change', (e) => {
+    if (fileInput.files.length > 0) {
+        handleFileSelected(fileInput.files[0]);
+    }
+});
+
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragover');
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) {
+        fileInput.files = e.dataTransfer.files;
+        handleFileSelected(e.dataTransfer.files[0]);
+    }
+});
+
+function handleFileSelected(file) {
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+        showToast('Please select a valid .csv file.', 'error');
+        fileInput.value = '';
+        fileNameDisplay.style.display = 'none';
+        submitBtn.disabled = true;
+        return;
+    }
+    fileNameDisplay.textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+    fileNameDisplay.style.display = 'block';
+    submitBtn.disabled = false;
+}
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!fileInput.files.length) return;
+
+    try {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing with Pandas...';
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        const res = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+            showToast(data.message, 'success');
+            
+            // Display Results
+            const resCard = document.getElementById('upload-results-card');
+            resCard.style.display = 'block';
+            document.getElementById('res-total-rows').textContent = data.total_rows_in_file;
+            document.getElementById('res-imported').textContent = data.imported_count;
+            document.getElementById('res-skipped').textContent = data.skipped_count;
+
+            const skippedBox = document.getElementById('skipped-details-box');
+            const errorBody = document.getElementById('skipped-errors-body');
+            
+            if (data.skipped_count > 0 && data.skipped_details) {
+                skippedBox.style.display = 'block';
+                errorBody.innerHTML = data.skipped_details.map(item => `
+                    <tr>
+                        <td style="font-weight:600;">Row #${item.row_number}</td>
+                        <td style="color:var(--danger);">${item.errors.join(', ')}</td>
+                    </tr>
+                `).join('');
+            } else {
+                skippedBox.style.display = 'none';
+            }
+
+            resCard.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            showToast(data.message || 'Error processing CSV.', 'error');
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('Failed to upload file.', 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-upload"></i> <span>Process & Import Dataset</span>';
+    }
+});
+</script>
+{% endblock %}

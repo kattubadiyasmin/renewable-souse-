@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}WattWise - AI Energy Demand Prediction{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            <i class="fas fa-brain" style="color: #a78bfa;"></i>
+            Energy Demand Prediction Engine
+        </h1>
+        <p class="page-subtitle">Dynamic Random Forest Regressor trained on campus telemetry and diurnal cycles</p>
+    </div>
+</div>
+
+<!-- Controls Card -->
+<div class="card" style="margin-bottom: 24px; padding: 20px 24px;">
+    <div style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
+        <div class="form-group" style="min-width: 200px;">
+            <label class="form-label" for="pred-building"><i class="fas fa-building"></i> Target Facility</label>
+            <select id="pred-building" class="form-control">
+                <option value="All">All Campus Buildings (Total Load)</option>
+                {% for b in buildings %}
+                <option value="{{ b }}">{{ b }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group" style="min-width: 180px;">
+            <label class="form-label" for="pred-date"><i class="far fa-calendar-days"></i> Forecast Target Date</label>
+            <input type="date" id="pred-date" class="form-control" value="{{ today_str }}">
+        </div>
+
+        <div>
+            <button class="btn btn-primary" onclick="runPrediction()" id="pred-run-btn" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);">
+                <i class="fas fa-wand-magic-sparkles"></i>
+                <span>Generate ML Forecast</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Prediction KPIs -->
+<div class="kpi-grid">
+    <div class="kpi-card" style="border-left-color: #8b5cf6;">
+        <div class="kpi-info">
+            <h3>Predicted 24h Demand</h3>
+            <div class="kpi-value" id="pred-total-kwh">--</div>
+            <div class="kpi-subtext" id="pred-diff-subtext"><i class="fas fa-chart-line"></i> Estimated Daily Consumption</div>
+        </div>
+        <div class="kpi-icon" style="background: rgba(139, 92, 246, 0.12); color: #a78bfa;"><i class="fas fa-bolt"></i></div>
+    </div>
+
+    <div class="kpi-card danger">
+        <div class="kpi-info">
+            <h3>Expected Peak Window</h3>
+            <div class="kpi-value" id="pred-peak-time" style="font-size: 1.35rem;">--</div>
+            <div class="kpi-subtext" id="pred-peak-kwh-subtext"><i class="far fa-clock"></i> Highest load hour</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-fire"></i></div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-info">
+            <h3>Day-of-Week Benchmark</h3>
+            <div class="kpi-value" id="pred-benchmark">--</div>
+            <div class="kpi-subtext"><i class="fas fa-scale-balanced"></i> Historical Baseline</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-calendar-day"></i></div>
+    </div>
+
+    <div class="kpi-card cyan">
+        <div class="kpi-info">
+            <h3>Model Accuracy (R²)</h3>
+            <div class="kpi-value" id="pred-r2-score">--</div>
+            <div class="kpi-subtext" id="pred-mae-subtext"><i class="fas fa-circle-check"></i> Scikit-learn Fit</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-square-root-variable"></i></div>
+    </div>
+</div>
+
+<!-- Status & Fallback Notification Banner -->
+<div id="pred-status-banner" style="display: none; margin-bottom: 24px; padding: 14px 20px; border-radius: var(--radius-sm); font-size: 0.88rem;"></div>
+
+<!-- 24-Hour Forecast Curve Chart -->
+<div class="card" style="margin-bottom: 28px;">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-chart-area" style="color: #a78bfa;"></i>
+            24-Hour Forecasted Demand Curve (Hourly Resolution)
+        </h3>
+        <span class="card-badge" id="pred-model-badge">Random Forest Regressor</span>
+    </div>
+    <div class="chart-container" style="height: 340px;">
+        <canvas id="chart-prediction-curve"></canvas>
+    </div>
+</div>
+
+<!-- Model Telemetry Info -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-circle-nodes"></i>
+            Machine Learning Pipeline Architecture
+        </h3>
+        <span class="card-badge">Scikit-Learn Ensemble</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; font-size: 0.85rem; color: var(--text-muted);">
+        <div style="background: rgba(15,23,42,0.5); padding: 14px; border-radius: 8px;">
+            <strong style="color: var(--text-main); display: block; margin-bottom: 4px;">Dynamic Retraining:</strong>
+            Model trains directly on historical SQLite records upon request without requiring pre-compiled static weights.
+        </div>
+        <div style="background: rgba(15,23,42,0.5); padding: 14px; border-radius: 8px;">
+            <strong style="color: var(--text-main); display: block; margin-bottom: 4px;">Engineered Features:</strong>
+            <code>hour</code>, <code>day_of_week</code>, <code>is_weekend</code>, <code>temperature</code>, <code>historical_building_mean</code>, and one-hot facility encodings.
+        </div>
+        <div style="background: rgba(15,23,42,0.5); padding: 14px; border-radius: 8px;">
+            <strong style="color: var(--text-main); display: block; margin-bottom: 4px;">High-Availability Fallback:</strong>
+            If database size drops below threshold or training errors occur, an empirical historical diurnal model takes over automatically.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/prediction.js') }}"></script>
+{% endblock %}

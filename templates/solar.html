@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}WattWise - Solar Energy & Photovoltaic Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            <i class="fas fa-sun" style="color: var(--solar);"></i>
+            Solar Generation & Utilization Analysis
+        </h1>
+        <p class="page-subtitle">Photovoltaic harvest telemetry, clean energy capture rates, and curtailment mitigation</p>
+    </div>
+    <div>
+        <button class="btn btn-secondary" onclick="loadSolarData()">
+            <i class="fas fa-arrows-rotate"></i>
+            <span>Refresh Solar Telemetry</span>
+        </button>
+    </div>
+</div>
+
+<!-- Dynamic Solar Insights Callout -->
+<div class="insight-box" style="border-color: var(--solar-glow); background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(16, 185, 129, 0.05));">
+    <h4 style="color: var(--solar);">
+        <i class="fas fa-solar-panel"></i>
+        Solar Photovoltaic Dynamic Intelligence
+    </h4>
+    <ul class="insight-list" id="solar-insights-list">
+        <li class="insight-item"><i class="fas fa-spinner fa-spin"></i> Calculating solar absorption coefficients...</li>
+    </ul>
+</div>
+
+<!-- Solar KPIs -->
+<div class="kpi-grid">
+    <div class="kpi-card solar">
+        <div class="kpi-info">
+            <h3>Total Solar Generated</h3>
+            <div class="kpi-value" id="sol-total-gen">--</div>
+            <div class="kpi-subtext"><i class="fas fa-sun"></i> Cumulative PV Yield</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-sun"></i></div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-info">
+            <h3>Total Solar Used</h3>
+            <div class="kpi-value" id="sol-total-used">--</div>
+            <div class="kpi-subtext"><i class="fas fa-bolt"></i> Directly Absorbed</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-charging-station"></i></div>
+    </div>
+
+    <div class="kpi-card danger">
+        <div class="kpi-info">
+            <h3>Unused / Curtailed</h3>
+            <div class="kpi-value" id="sol-unused" style="color: var(--warning);">--</div>
+            <div class="kpi-subtext"><i class="fas fa-arrow-down-long"></i> Storage / Grid Spill</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-battery-slash"></i></div>
+    </div>
+
+    <div class="kpi-card cyan">
+        <div class="kpi-info">
+            <h3>Solar Utilization %</h3>
+            <div class="kpi-value" id="sol-util-pct">--</div>
+            <div class="kpi-subtext"><i class="fas fa-percent"></i> (Used / Gen) &times; 100</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-chart-pie"></i></div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-info">
+            <h3>Renewable Share</h3>
+            <div class="kpi-value" id="sol-renew-fraction">--</div>
+            <div class="kpi-subtext"><i class="fas fa-leaf"></i> Of Total Campus Power</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-seedling"></i></div>
+    </div>
+
+    <div class="kpi-card solar">
+        <div class="kpi-info">
+            <h3>Peak Solar Window</h3>
+            <div class="kpi-value" id="sol-peak-window" style="font-size: 1.35rem;">--</div>
+            <div class="kpi-subtext" id="sol-peak-yield-subtext"><i class="far fa-clock"></i> Max irradiance hours</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+    </div>
+</div>
+
+<!-- Charts Grid -->
+<div class="charts-grid-2">
+    <!-- Chart 1: Solar Generation by Time (Diurnal 24h Profile) -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title" style="color: var(--solar);">
+                <i class="fas fa-chart-line"></i>
+                Solar Generation vs Utilization by Time of Day
+            </h3>
+            <span class="card-badge">24-Hour Profile</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-solar-hourly"></canvas>
+        </div>
+    </div>
+
+    <!-- Chart 2: Solar Used vs Unused (Doughnut) -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-chart-pie"></i>
+                Solar Absorption vs Unused Curtailment
+            </h3>
+            <span class="card-badge">Capture Efficiency</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-solar-donut"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="charts-grid-2" style="margin-top: 24px;">
+    <!-- Chart 3: Daily Renewable Contribution Trend -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-calendar-days"></i>
+                Daily Renewable Utilization Trend (14 Days)
+            </h3>
+            <span class="card-badge">Day-by-Day Track</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-solar-daily-trend"></canvas>
+        </div>
+    </div>
+
+    <!-- Chart 4: Weather Impact on Generation -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-cloud-sun"></i>
+                Weather Condition Impact on PV Yield
+            </h3>
+            <span class="card-badge">Climatic Sensitivity</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-weather-efficiency"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/solar.js') }}"></script>
+{% endblock %}

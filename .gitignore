@@ -1,0 +1,26 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Database
+instance/
+*.sqlite3
+*.db
+*.db-journal
+
+# Uploads cache if temporary
+static/uploads/*.tmp
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

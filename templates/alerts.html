@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}WattWise - Wastage Detection & Anomaly Alerts{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            <i class="fas fa-triangle-exclamation" style="color: var(--danger);"></i>
+            Energy Wastage & Anomaly Detection
+        </h1>
+        <p class="page-subtitle">Hybrid intelligence combining deterministic rule-engine thresholds with Scikit-learn Isolation Forest</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <button class="btn btn-secondary" onclick="loadAlerts()">
+            <i class="fas fa-arrows-rotate"></i>
+            <span>Scan Telemetry</span>
+        </button>
+    </div>
+</div>
+
+<!-- Architecture Dual-Engine Badge Banner -->
+<div class="card" style="margin-bottom: 24px; background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9));">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 46px; height: 46px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); color: var(--danger); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                <i class="fas fa-shield-virus"></i>
+            </div>
+            <div>
+                <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
+                    Dual-Engine Detection Pipeline Active
+                </h4>
+                <p style="font-size: 0.82rem; color: var(--text-muted);">
+                    Rule Engine (Working Hours 8AM-6PM, Z-Score Outliers, Curtailment, Battery Reserves) + Isolation Forest (Multivariate Pattern Analysis)
+                </p>
+            </div>
+        </div>
+        <div>
+            <span class="badge badge-success" id="ml-engine-badge"><i class="fas fa-check"></i> Isolation Forest Active</span>
+        </div>
+    </div>
+</div>
+
+<!-- Severity Metric Cards -->
+<div class="kpi-grid">
+    <div class="kpi-card" style="cursor: pointer;" onclick="filterAlerts('ALL')">
+        <div class="kpi-info">
+            <h3>Total Detected</h3>
+            <div class="kpi-value" id="alert-total-count">--</div>
+            <div class="kpi-subtext">Click to view all</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-bell"></i></div>
+    </div>
+
+    <div class="kpi-card danger" style="cursor: pointer;" onclick="filterAlerts('HIGH')">
+        <div class="kpi-info">
+            <h3>Critical / High</h3>
+            <div class="kpi-value" id="alert-high-count" style="color: var(--danger);">--</div>
+            <div class="kpi-subtext">Immediate action required</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-radiation"></i></div>
+    </div>
+
+    <div class="kpi-card solar" style="cursor: pointer;" onclick="filterAlerts('MEDIUM')">
+        <div class="kpi-info">
+            <h3>Medium Priority</h3>
+            <div class="kpi-value" id="alert-med-count" style="color: var(--solar);">--</div>
+            <div class="kpi-subtext">Efficiency & storage alerts</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-circle-exclamation"></i></div>
+    </div>
+
+    <div class="kpi-card cyan" style="cursor: pointer;" onclick="filterAlerts('LOW')">
+        <div class="kpi-info">
+            <h3>Low / Moderate</h3>
+            <div class="kpi-value" id="alert-low-count" style="color: var(--cyan);">--</div>
+            <div class="kpi-subtext">Mild statistical drifts</div>
+        </div>
+        <div class="kpi-icon"><i class="fas fa-info-circle"></i></div>
+    </div>
+</div>
+
+<!-- Alerts Table Section -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-table-list"></i>
+            Active Wastage & Anomaly Incident Log
+        </h3>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary filter-tab active" data-filter="ALL" onclick="filterAlerts('ALL')" style="padding: 5px 12px; font-size: 0.78rem;">All</button>
+            <button class="btn btn-secondary filter-tab" data-filter="HIGH" onclick="filterAlerts('HIGH')" style="padding: 5px 12px; font-size: 0.78rem;">High</button>
+            <button class="btn btn-secondary filter-tab" data-filter="MEDIUM" onclick="filterAlerts('MEDIUM')" style="padding: 5px 12px; font-size: 0.78rem;">Medium</button>
+            <button class="btn btn-secondary filter-tab" data-filter="LOW" onclick="filterAlerts('LOW')" style="padding: 5px 12px; font-size: 0.78rem;">Low</button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table" id="alerts-table">
+            <thead>
+                <tr>
+                    <th style="width: 130px;">Facility</th>
+                    <th style="width: 140px;">Timestamp</th>
+                    <th style="width: 100px;">Severity</th>
+                    <th style="width: 180px;">Detected Issue</th>
+                    <th>Analytical Reason</th>
+                    <th>Actionable Recommendation</th>
+                    <th style="width: 130px;">Method</th>
+                </tr>
+            </thead>
+            <tbody id="alerts-table-body">
+                <tr><td colspan="7" style="text-align: center; color: var(--text-dim);">Running anomaly detection algorithms...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+{% endblock %}
